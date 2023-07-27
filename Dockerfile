@@ -1,4 +1,4 @@
-FROM fedora:latest
+FROM fedora:38
 LABEL "maintainer"="Marco Mornati <marco@mornati.net>"
 LABEL "com.github.actions.name"="RPM Builder"
 LABEL "com.github.actions.description"="Build RPM using RedHat Mock"
@@ -15,6 +15,9 @@ RUN useradd mockbuilder && \
     chmod g+w /etc/mock/*.cfg
 
 ONBUILD COPY mock /etc/mock
+
+RUN mkdir -p /builddir/build && \
+	chown -R mockbuilder:mock /builddir/build
 
 COPY ./build-rpm.sh /build-rpm.sh
 RUN chmod +x /build-rpm.sh
