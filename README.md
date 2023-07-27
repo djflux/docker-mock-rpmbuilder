@@ -46,8 +46,8 @@ this way:
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG="epel-8-aarch64" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG="rhel+epel-8-aarch64" \
 -e SOURCE_RPM="git-2.3.0-1.el7.centos.src.rpm" mmornati/mock-rpmbuilder
 ```
 
@@ -56,8 +56,8 @@ RPMs you need to start the docker container in this way:
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG="epel-8-aarch64" -e SOURCES="SOURCES/git-2.3.0.tar.gz" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG="rhel+epel-8-aarch64" -e SOURCES="SOURCES/git-2.3.0.tar.gz" \
 -e SPEC_FILE="SPECS/git.spec" mmornati/mock-rpmbuilder
 ```
 
@@ -66,8 +66,8 @@ SOURCE variable, rpmbuild will try to download it before mock build
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG="epel-8-aarch64" -e SPEC_FILE="SPECS/git.spec" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG="rhel+epel-8-aarch64" -e SPEC_FILE="SPECS/git.spec" \
 mmornati/mock-rpmbuilder
 ```
 
@@ -75,7 +75,7 @@ In case, when build requires network inside chroot (for example to build golang 
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
 -e MOCK_CONFIG="centos-stream-8-x86_64" -e NETWORK="true" \
 -e SPEC_FILE="SPECS/prometheus.spec" mmornati/mock-rpmbuilder
 ```
@@ -88,8 +88,8 @@ spaces.
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG="epel-8-aarch64" -e SOURCES="SOURCES/git-2.3.0.tar.gz" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG="rhel+epel-8-aarch64" -e SOURCES="SOURCES/git-2.3.0.tar.gz" \
 -e SPEC_FILE="SPECS/git.spec" \
 -e MOCK_DEFINES="VERSION=1 RELEASE=12 ANYTHING_ELSE=1" mmornati/mock-rpmbuilder
 ```
@@ -123,8 +123,8 @@ command:
 
 ```bash
 docker run --rm --privileged=true \
---volume="/Users/mmornati/rpmbuild:/rpmbuild" -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG="epel-8-aarch64" -e NO_CLEANUP="true" \
+--volume="/Users/mmornati/rpmbuild:/builddir/build" -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG="rhel+epel-8-aarch64" -e NO_CLEANUP="true" \
 -e SOURCES="SOURCES/git-2.3.0.tar.gz" -e SPEC_FILE="SPECS/git.spec" \
 mmornati/mock-rpmbuilder
 ```
@@ -144,9 +144,9 @@ $HOME/.gnupg:/home/rpmbuilder/.gnupg:ro
 You can put the passphrase in a file and use GPG_PASS="$(cat $PWD/.gpg_pass)"
 
 ```basb
-docker run --cap-add=SYS_ADMIN -d -e MOUNT_POINT="/rpmbuild" \
--e MOCK_CONFIG=epel-8-aarch64 -e SOURCE_RPM=git-2.3.0-1.el7.centos.src.rpm \
--v /Users/mmornati/rpmbuild:/rpmbuild -e SIGNATURE="Corporate Repo Key" \
+docker run --cap-add=SYS_ADMIN -d -e MOUNT_POINT="/builddir/build" \
+-e MOCK_CONFIG=rhel+epel-8-aarch64 -e SOURCE_RPM=git-2.3.0-1.el7.centos.src.rpm \
+-v /Users/mmornati/rpmbuild:/builddir/build -e SIGNATURE="Corporate Repo Key" \
 -e GPG_PASS="$(cat $PWD/.gpg_pass)" -v $HOME/.gnupg:/home/builder/.gnupg:ro \
 mmornati/mock-rpmbuilder
 ```
@@ -165,7 +165,7 @@ action "Build RPM" {
   env = {
     SPEC_FILE = "git.spec"
     SOURCES = "git-2.3.0.tar.gz"
-    MOCK_CONFIG = "epel-8-aarch64"
+    MOCK_CONFIG = "rhel+epel-8-aarch64"
     MOUNT_POINT = "${GITHUB_WORKSPACE}"
   }
 }
@@ -182,7 +182,7 @@ f8d161e72832        mmornati/mockrpmbuilder:latest   "/build-rpm.sh"     2 secon
 [root@server docker-mock-rpmbuilder]# docker logs -f f8d161e72832
 => Building parameters:
 ========================================================================
-      MOCK_CONFIG:    epel-8-aarch64
+      MOCK_CONFIG:    rhel+epel-8-aarch64
       SOURCE_RPM:     git-2.3.0-1.el7.centos.src.rpm
 ========================================================================
 INFO: mock.py version 1.2.6 starting (python version = 2.7.5)...
@@ -190,7 +190,7 @@ Start: init plugins
 INFO: selinux disabled
 Finish: init plugins
 Start: run
-INFO: Start(/rpmbuild/git-2.3.0-1.el7.centos.src.rpm)  Config(epel-8-aarch64)
+INFO: Start(/builddir/build/git-2.3.0-1.el7.centos.src.rpm)  Config(rhel+epel-8-aarch64)
 Start: clean chroot
 Finish: clean chroot
 Start: chroot init
@@ -218,7 +218,7 @@ totale 188
 
 ## Output
 
-If all worked well, you should have all the RPMs (source + binaries) availables
+If all worked well, you should have all the RPMs (source + binaries) available
 in the configured output folder:
 
 ```bash
